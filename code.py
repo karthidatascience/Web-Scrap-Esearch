@@ -40,9 +40,10 @@ def scrape_data(parcel_numbers, selected_fields, selected_domains):
                     'Land_Homesite_Value': '',
                     'Land_Non_Homesite_Value': '',
                     'Agricultural_Market_Valuation': '',
-                    'Market_Value':''
-
-
+                    'Market_Value':'',
+                    'Appraised_Value':'',
+                    'Assessed_Value':'',
+                    'Ag_Use_Value':'',
                 }
                 if 'Geographic_ID' in selected_fields:
                     Geographic_ID = re.findall(
@@ -212,6 +213,30 @@ def scrape_data(parcel_numbers, selected_fields, selected_domains):
                     Market_Value = Market_Value.split('Market Value:')[1].replace('</th><td class="table-number">', '').strip()
                     scraped_data['Market_Value'] = Market_Value
 
+                if 'Appraised_Value' in selected_fields:
+                    Appraised_Value = re.findall(r'Appraised Value:<\/th><td class="table-number">[^<>]*', str(soup))
+                    Appraised_Value = ' '.join(Appraised_Value)
+                    Appraised_Value = re.sub('\s+', ' ', Appraised_Value)
+                    Appraised_Value = Appraised_Value.split('Appraised Value:')[1].replace(
+                        '</th><td class="table-number">', '').strip()
+                    scraped_data['Appraised_Value'] = Appraised_Value
+
+                if 'Assessed_Value' in selected_fields:
+                    Assessed_Value = re.findall(r'Assessed Value:<\/th><td class="table-number">[^<>]*', str(soup))
+                    Assessed_Value = ' '.join(Assessed_Value)
+                    Assessed_Value = re.sub('\s+', ' ', Assessed_Value)
+                    Assessed_Value = Assessed_Value.split('Assessed Value:')[1].replace(
+                        '</th><td class="table-number">', '').strip()
+                    scraped_data['Assessed_Value'] = Assessed_Value
+
+                if 'Ag_Use_Value' in selected_fields:
+                    Ag_Use_Value = re.findall(r'Ag Use Value:<\/th><td class="table-number">[^<>]*', str(soup))
+                    Ag_Use_Value = ' '.join(Ag_Use_Value)
+                    Ag_Use_Value = re.sub('\s+', ' ', Ag_Use_Value)
+                    Ag_Use_Value = Ag_Use_Value.split('Ag Use Value:')[1].replace('</th><td class="table-number">',
+                                                                                  '').strip()
+                    scraped_data['Ag_Use_Value'] = Ag_Use_Value
+
 
 
                 row_dict = {'domain': selected_domain, 'parcel_number': txroll_cadaccountnumber, **scraped_data}
@@ -250,7 +275,7 @@ def main():
             parcel_numbers = df['parcel_number'].tolist()
 
             # Define available fields for selection
-            available_fields = ['Select All','Geographic_ID','Property_ID','Type','Situs_Address','Map_ID','Mapsco','Legal_Description','Abstract_Subdivision','Neighborhood','owner_ID','name','Agent','Mailing_Address','Ownership','Improvement_Homesite_Value','Improvement_Non_Homesite_Value','Land_Homesite_Value','Land_Non_Homesite_Value','Agricultural_Market_Valuation','Market_Value']  # Add more fields here
+            available_fields = ['Select All','Geographic_ID','Property_ID','Type','Situs_Address','Map_ID','Mapsco','Legal_Description','Abstract_Subdivision','Neighborhood','owner_ID','name','Agent','Mailing_Address','Ownership','Improvement_Homesite_Value','Improvement_Non_Homesite_Value','Land_Homesite_Value','Land_Non_Homesite_Value','Agricultural_Market_Valuation','Market_Value','Appraised_Value','Assessed_Value','Ag_Use_Value']  # Add more fields here
 
             # Checkbox options for selecting fields
             selected_fields = st.multiselect('Select Fields for Output', available_fields)
